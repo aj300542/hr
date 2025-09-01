@@ -1,0 +1,42 @@
+[
+  {
+    "char": "🌋",
+    "x": 444,
+    "y": 352,
+    "size": 1058,
+    "rotation": -0.8726646259971644,
+    "rotationSwing": 0,
+    "animationHandle": null
+  },
+  {
+    "char": "🗼",
+    "x": 59,
+    "y": 341,
+    "size": 44,
+    "rotation": 0,
+    "swingSpeed": 8.48963534278695,
+    "swingPhaseOffset": 5.330139307143185,
+    "isSwinging": true,
+    "animationHandle": 126547,
+    "rotationSwing": -0.09022256756329582
+  },
+  {
+    "char": "🏯",
+    "x": 33,
+    "y": 405,
+    "size": 32,
+    "rotation": 0,
+    "swingSpeed": 11.834385021115118,
+    "swingPhaseOffset": 0.9194686549988368,
+    "isSwinging": true,
+    "animationHandle": 126548,
+    "rotationSwing": -0.1614343660272602
+  },
+  {
+    "char": "🌙",
+    "x": 148,
+    "y": 227,
+    "size": 218,
+    "rotation": 0
+  }
+]
