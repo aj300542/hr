@@ -135,7 +135,14 @@
             background-color: #e0e0e0;
         }
 
-        .controlGroup,
+        .controlGroup {
+            position: fixed;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5vh;
+            z-index: 20;
+        }
+
         .sceneLoaderPanel {
             position: fixed;
             display: flex;
@@ -144,7 +151,16 @@
             z-index: 20;
         }
 
-        .controlGroup button,
+        .controlGroup button {
+            padding: 1.2vh 1.2vw;
+            font-size: 1.2vh;
+            padding: 1vh 1.5vh;
+            cursor: pointer;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            transition: background-color 0.3s;
+        }
+
         .sceneLoaderPanel button {
             padding: 1.2vh 1.2vw;
             font-size: 1.2vh;
@@ -163,10 +179,15 @@
             border-radius: 50%;
         }
 
-        .controlGroup button:hover,
+        .controlGroup button:hover {
+            background-color: #eee;
+        }
+
         .sceneLoaderPanel button:hover {
             background-color: #eee;
         }
+
+
 
         /* 📱 竖屏优化 */
         @media screen and (orientation: portrait) {
@@ -176,7 +197,10 @@
                 /* 更适合竖屏比例 */
             }
 
-            .controlGroup,
+            .controlGroup {
+                top: 10vh;
+            }
+
             .sceneLoaderPanel {
                 top: 10vh;
             }
@@ -198,7 +222,10 @@
                 /* 横屏16:9 */
             }
 
-            .controlGroup,
+            .controlGroup {
+                top: 10vh;
+            }
+
             .sceneLoaderPanel {
                 top: 10vh;
             }
