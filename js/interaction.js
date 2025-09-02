@@ -300,9 +300,12 @@ canvas.addEventListener("dblclick", (e) => {
         }
     }
 });
-let lastTouchDistance = null;
 let longPressTimer = null;
+let longPressStartX = 0;
+let longPressStartY = 0;
 let lastTouchTap = 0;
+let lastTouchDistance = null;
+
 
 // 📱 触摸开始
 canvas.addEventListener("touchstart", (e) => {
@@ -312,58 +315,28 @@ canvas.addEventListener("touchstart", (e) => {
     const mx = touch.clientX - rect.left;
     const my = touch.clientY - rect.top;
 
-    // ✅ 快速双击模拟置顶
-    if (e.touches.length === 1 && now - lastTouchTap < 300) {
-        for (let i = elements.length - 1; i >= 0; i--) {
-            const el = elements[i];
-            if (el.type === "group") {
-                const bounds = el.children.reduce((acc, child) => {
-                    const cx = el.x + child.x;
-                    const cy = el.y + child.y;
-                    const hs = child.size / 2;
-                    return {
-                        left: Math.min(acc.left, cx - hs),
-                        right: Math.max(acc.right, cx + hs),
-                        top: Math.min(acc.top, cy - hs),
-                        bottom: Math.max(acc.bottom, cy + hs)
-                    };
-                }, {
-                    left: Infinity, right: -Infinity, top: Infinity, bottom: -Infinity
-                });
+    longPressStartX = mx;
+    longPressStartY = my;
 
-                if (mx >= bounds.left && mx <= bounds.right && my >= bounds.top && my <= bounds.bottom) {
-                    const [selected] = elements.splice(i, 1);
-                    elements.push(selected);
-                    selectedIndex = elements.length - 1;
-                    drawAll();
-                    break;
-                }
-            } else {
-                const bounds = el.size;
-                if (Math.abs(mx - el.x) < bounds / 2 && Math.abs(my - el.y) < bounds / 2) {
-                    const [selected] = elements.splice(i, 1);
-                    elements.push(selected);
-                    selectedIndex = elements.length - 1;
-                    drawAll();
-                    break;
-                }
-            }
-        }
-    }
-    lastTouchTap = now;
-
-    // ✅ 长按取消选中（模拟右键）
+    // ✅ 长按静止取消选中
     longPressTimer = setTimeout(() => {
+        if (selectedIndex !== null) {
+            selectedIndex = null;
+            selectedIndices = [];
+            drawAll();
+        }
+    }, 600);
+
+    // ✅ 双指轻点取消选中（备用方式）
+    if (e.touches.length === 2 && now - lastTouchTap < 400) {
         selectedIndex = null;
         selectedIndices = [];
         drawAll();
-    }, 600);
-
-    if (e.ctrlKey || e.metaKey) {
-        selectionBox = { startX: mx, startY: my, endX: mx, endY: my };
-        return;
     }
 
+    lastTouchTap = now;
+
+    // ✅ 拖动选中逻辑
     selectedIndex = null;
     selectedIndices = [];
     dragging = false;
@@ -371,6 +344,8 @@ canvas.addEventListener("touchstart", (e) => {
 
     for (let i = elements.length - 1; i >= 0; i--) {
         const el = elements[i];
+        const bounds = el.size;
+
         if (el.type === "group") {
             const bounds = el.children.reduce((acc, child) => {
                 const cx = el.x + child.x;
@@ -396,7 +371,6 @@ canvas.addEventListener("touchstart", (e) => {
                 break;
             }
         } else {
-            const bounds = el.size;
             if (Math.abs(mx - el.x) < bounds / 2 && Math.abs(my - el.y) < bounds / 2) {
                 dragIndex = i;
                 selectedIndex = i;
@@ -413,15 +387,27 @@ canvas.addEventListener("touchstart", (e) => {
     e.preventDefault();
 }, { passive: false });
 
+
+
 // 📱 触摸移动（双指缩放 + 单指拖动）
 canvas.addEventListener("touchmove", (e) => {
-    clearTimeout(longPressTimer);
+    const rect = canvas.getBoundingClientRect();
 
+    // ✅ 判断是否移动，取消长按
+    const touch = e.touches[0];
+    const mx = touch.clientX - rect.left;
+    const my = touch.clientY - rect.top;
+    const dx = Math.abs(mx - longPressStartX);
+    const dy = Math.abs(my - longPressStartY);
+    const moveThreshold = 10;
+    if (dx > moveThreshold || dy > moveThreshold) {
+        clearTimeout(longPressTimer);
+    }
+
+    // ✅ 双指缩放
     if (e.touches.length === 2) {
-        const rect = canvas.getBoundingClientRect();
         const t1 = e.touches[0];
         const t2 = e.touches[1];
-
         const x1 = t1.clientX - rect.left;
         const y1 = t1.clientY - rect.top;
         const x2 = t2.clientX - rect.left;
@@ -478,19 +464,8 @@ canvas.addEventListener("touchmove", (e) => {
         return;
     }
 
+    // ✅ 单指拖动
     if (e.touches.length === 1) {
-        const touch = e.touches[0];
-        const rect = canvas.getBoundingClientRect();
-        const mx = touch.clientX - rect.left;
-        const my = touch.clientY - rect.top;
-
-        if (selectionBox) {
-            selectionBox.endX = mx;
-            selectionBox.endY = my;
-            drawAll();
-            return;
-        }
-
         if (!dragging || dragIndex === null) return;
 
         const el = elements[dragIndex];
@@ -511,11 +486,17 @@ canvas.addEventListener("touchmove", (e) => {
     }
 }, { passive: false });
 
+
+
 // 📱 触摸结束
 canvas.addEventListener("touchend", (e) => {
     clearTimeout(longPressTimer);
+    longPressTimer = null;
     lastTouchDistance = null;
+    dragging = false;
+    dragIndex = null;
 
+    // ✅ 框选处理
     if (selectionBox) {
         const x1 = Math.min(selectionBox.startX, selectionBox.endX);
         const x2 = Math.max(selectionBox.startX, selectionBox.endX);
@@ -532,9 +513,6 @@ canvas.addEventListener("touchend", (e) => {
 
         selectionBox = null;
         drawAll();
-        return;
     }
-
-    dragging = false;
-    dragIndex = null;
 });
+
