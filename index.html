@@ -67,7 +67,19 @@
         <button onclick="loadSceneByName('music')">🏞️音乐</button>
         <button onclick="loadSceneByName('culture')">🪁文化</button>
         <button id="material">🤪素材</button>
+        <button id="aj300542">🫨更多</button>
         <button id="aj300">🍚捐赠</button>
+    </div>
+    <div class="controlGroup">
+        <button onclick="saveInitialStates()">1</button>
+        <button onclick="restoreInitialStates()">2</button>
+        <button onclick="animateMoveForSelected()">3</button>
+        <button onclick="startSwingForSelected()">4</button>
+        <button onclick="startRotationForSelected()">5</button>
+        <button onclick="startScaleForSelected()">6</button>
+        <button onclick="flipSelfHorizontal()">7</button>
+        <button onclick="fillSelectedElement()">8</button>
+        <button onclick="stopAnimationForSelected()">9</button>
     </div>
     <div id="consolePanel"></div>
 
@@ -196,6 +208,9 @@
     <script>
         document.getElementById("material").addEventListener("click", () => {
             window.open("https://aj300542.github.io/emoji/index2.html", "_blank");
+        });
+        document.getElementById("aj300542").addEventListener("click", () => {
+            window.open("https://aj300542.github.io", "_blank");
         });
         document.getElementById("aj300").addEventListener("click", () => {
             window.open("https://aj300542.github.io/download.html", "_blank");
