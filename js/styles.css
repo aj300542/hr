@@ -135,6 +135,7 @@
             background-color: #e0e0e0;
         }
 
+        .controlGroup,
         .sceneLoaderPanel {
             position: fixed;
             display: flex;
@@ -143,6 +144,7 @@
             z-index: 20;
         }
 
+        .controlGroup button,
         .sceneLoaderPanel button {
             padding: 1.2vh 1.2vw;
             font-size: 1.2vh;
@@ -150,10 +152,18 @@
             cursor: pointer;
             background-color: #fff;
             border: 1px solid #ccc;
-            border-radius: 0.4vh;
             transition: background-color 0.3s;
         }
 
+        .sceneLoaderPanel button {
+            border-radius: 0.4vh;
+        }
+
+        .controlGroup button {
+            border-radius: 50%;
+        }
+
+        .controlGroup button:hover,
         .sceneLoaderPanel button:hover {
             background-color: #eee;
         }
@@ -166,9 +176,17 @@
                 /* 更适合竖屏比例 */
             }
 
+            .controlGroup,
+            .sceneLoaderPanel {
+                top: 10vh;
+            }
+
+            .controlGroup {
+                right: 0cm;
+            }
+
             .sceneLoaderPanel {
                 left: -3vw;
-                top: 15vh;
             }
         }
 
@@ -180,9 +198,17 @@
                 /* 横屏16:9 */
             }
 
+            .controlGroup,
             .sceneLoaderPanel {
-                left: -2vw;
-                top: 15vh;
+                top: 10vh;
+            }
+
+            .controlGroup {
+                right: 0vw;
+            }
+
+            .sceneLoaderPanel {
+                left: -3vw;
             }
         }
 
