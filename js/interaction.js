@@ -305,6 +305,9 @@ let longPressStartX = 0;
 let longPressStartY = 0;
 let lastTouchTap = 0;
 let lastTouchDistance = null;
+let lastTapX = 0;
+let lastTapY = 0;
+
 
 
 // 📱 触摸开始
@@ -314,6 +317,59 @@ canvas.addEventListener("touchstart", (e) => {
     const rect = canvas.getBoundingClientRect();
     const mx = touch.clientX - rect.left;
     const my = touch.clientY - rect.top;
+
+    const timeDelta = now - lastTouchTap;
+    const distDelta = Math.hypot(mx - lastTapX, my - lastTapY);
+
+    // ✅ 快速双击置顶元素（时间 < 300ms 且距离 < 20px）
+    if (timeDelta < 300 && distDelta < 20) {
+        for (let i = elements.length - 1; i >= 0; i--) {
+            const el = elements[i];
+
+            if (el.type === "group") {
+                const bounds = el.children.reduce((acc, child) => {
+                    const cx = el.x + child.x;
+                    const cy = el.y + child.y;
+                    const hs = child.size / 2;
+                    return {
+                        left: Math.min(acc.left, cx - hs),
+                        right: Math.max(acc.right, cx + hs),
+                        top: Math.min(acc.top, cy - hs),
+                        bottom: Math.max(acc.bottom, cy + hs)
+                    };
+                }, {
+                    left: Infinity, right: -Infinity, top: Infinity, bottom: -Infinity
+                });
+
+                if (mx >= bounds.left && mx <= bounds.right && my >= bounds.top && my <= bounds.bottom) {
+                    const [selected] = elements.splice(i, 1);
+                    elements.push(selected);
+                    selectedIndex = elements.length - 1;
+                    drawAll();
+                    break;
+                }
+            } else {
+                const bounds = el.size;
+                if (Math.abs(mx - el.x) < bounds / 2 && Math.abs(my - el.y) < bounds / 2) {
+                    const [selected] = elements.splice(i, 1);
+                    elements.push(selected);
+                    selectedIndex = elements.length - 1;
+                    drawAll();
+                    break;
+                }
+            }
+        }
+
+        lastTouchTap = 0;
+        lastTapX = 0;
+        lastTapY = 0;
+        return;
+    }
+
+    // ✅ 记录本次触点
+    lastTouchTap = now;
+    lastTapX = mx;
+    lastTapY = my;
 
     longPressStartX = mx;
     longPressStartY = my;
@@ -333,8 +389,6 @@ canvas.addEventListener("touchstart", (e) => {
         selectedIndices = [];
         drawAll();
     }
-
-    lastTouchTap = now;
 
     // ✅ 拖动选中逻辑
     selectedIndex = null;
@@ -386,6 +440,7 @@ canvas.addEventListener("touchstart", (e) => {
     drawAll();
     e.preventDefault();
 }, { passive: false });
+
 
 
 
